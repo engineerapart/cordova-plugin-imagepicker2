@@ -8,6 +8,9 @@
 
 #import <Cordova/CDVPlugin.h>
 
+// It would be great to integrate changes made by this guy:
+// https://github.com/nixplay/cordova-imagePicker
+// The Android library handling is much better.
 
 @interface SOSPicker : CDVPlugin < UINavigationControllerDelegate, UIScrollViewDelegate>
 
@@ -21,7 +24,11 @@
 
 @property (nonatomic, assign) NSInteger width;
 @property (nonatomic, assign) NSInteger height;
+@property (nonatomic, assign) NSInteger maximumImagesCount;
 @property (nonatomic, assign) NSInteger quality;
 @property (nonatomic, assign) NSInteger outputType;
+@property (nonatomic, assign) BOOL allow_video;
+@property (nonatomic, assign) NSString* title;
+@property (nonatomic, assign) NSString* message;
 
 @end

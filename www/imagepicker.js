@@ -3,6 +3,8 @@
  * An Image Picker plugin for Cordova
  *
  * Developed by Wymsee for Sync OnSet
+ * Maintained by Telerik
+ * Forked by Rolamix to enable cordova-android>6 permissions model.
  */
 
 var ImagePicker = function() {
@@ -30,6 +32,15 @@ ImagePicker.prototype.hasReadPermission = function(callback) {
 
 ImagePicker.prototype.requestReadPermission = function(callback) {
   return cordova.exec(callback, null, "ImagePicker", "requestReadPermission", []);
+};
+
+/**
+ * Clears temporary files
+ * @param success - success callback, will receive the data sent from the native plugin
+ * @param fail - error callback, will receive an error string describing what went wrong
+ */
+ImagePicker.prototype.cleanupTempFiles = function(success, fail) {
+  return cordova.exec(success, fail, "ImagePicker", "cleanupTempFiles", []);
 };
 
 /*

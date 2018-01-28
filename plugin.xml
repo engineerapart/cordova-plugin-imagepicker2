@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
   xmlns:android="http://schemas.android.com/apk/res/android"
-  id="com.synconset.imagepicker"
-  version="2.1.8">
+  id="cordova-plugin-imagepicker2"
+  version="2.2.0">
 
     <name>ImagePicker</name>
 
@@ -13,7 +13,9 @@
     <license>MIT</license>
 
     <engines>
-        <engine name="cordova" version=">=3.5.0" />
+      <engine name="cordova" version=">=7.1.0"/>
+      <engine name="cordova-android" version=">=6.3.0"/>
+      <engine name="cordova-ios" version=">=4.5.0"/>
     </engines>
 
     <js-module src="www/imagepicker.js" name="ImagePicker">
@@ -26,11 +28,6 @@
             <feature name="ImagePicker">
                 <param name="ios-package" value="SOSPicker"/>
             </feature>
-        </config-file>
-        
-        <preference name="PHOTO_LIBRARY_USAGE_DESCRIPTION" default=" " />
-        <config-file target="*-Info.plist" parent="NSPhotoLibraryUsageDescription">
-          <string>$PHOTO_LIBRARY_USAGE_DESCRIPTION</string>
         </config-file>
 
         <header-file src="src/ios/SOSPicker.h" />
@@ -80,7 +77,7 @@
         <resource-file src="src/ios/GMImagePicker/it.lproj" />
         <resource-file src="src/ios/GMImagePicker/pt.lproj" />
         <resource-file src="src/ios/GMImagePicker/zh-Hans.lproj" />
-        
+
         <framework src="Accelerate.framework" />
         <framework src="Security.framework" />
         <framework src="Photos.framework" />
@@ -92,27 +89,27 @@
     <!-- android -->
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="ImagePicker">
-                <param name="android-package" value="com.synconset.ImagePicker"/>
-            </feature>
+          <feature name="ImagePicker">
+            <param name="android-package" value="com.rolamix.ImagePicker"/>
+          </feature>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <activity android:label="@string/multi_app_name" android:name="com.synconset.MultiImageChooserActivity" android:theme="@style/Theme.AppCompat.Light">
-            </activity>
+          <activity android:label="@string/multi_app_name" android:name="com.rolamix.MultiImageChooserActivity" android:theme="@style/Theme.AppCompat.Light">
+          </activity>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+          <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         </config-file>
 
         <framework src="com.android.support:appcompat-v7:23+" />
 
-        <source-file src="src/android/com/synconset/ImagePicker/ImagePicker.java" target-dir="src/com/synconset" />
-        <source-file src="src/android/com/synconset/ImagePicker/FakeR.java" target-dir="src/com/synconset" />
+        <source-file src="src/android/com/rolamix/ImagePicker/ImagePicker.java" target-dir="src/com/rolamix" />
+        <source-file src="src/android/com/rolamix/ImagePicker/FakeR.java" target-dir="src/com/rolamix" />
 
-        <source-file src="src/android/Library/src/ImageFetcher.java" target-dir="src/com/synconset"/>
-        <source-file src="src/android/Library/src/MultiImageChooserActivity.java" target-dir="src/com/synconset"/>
+        <source-file src="src/android/Library/src/ImageFetcher.java" target-dir="src/com/rolamix"/>
+        <source-file src="src/android/Library/src/MultiImageChooserActivity.java" target-dir="src/com/rolamix"/>
 
         <source-file src="src/android/Library/res/anim/image_pop_in.xml" target-dir="res/anim"/>
         <source-file src="src/android/Library/res/drawable/grid_background.xml" target-dir="res/drawable"/>

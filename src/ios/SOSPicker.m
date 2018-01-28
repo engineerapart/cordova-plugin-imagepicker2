@@ -53,15 +53,16 @@ typedef enum : NSUInteger {
 }
 
 - (void) getPictures:(CDVInvokedUrlCommand *)command {
-
     NSDictionary *options = [command.arguments objectAtIndex: 0];
+    NSInteger maximumImagesCount = [[options objectForKey:@"maximumImagesCount"] integerValue];
+    self.maximumImagesCount = (maximumImagesCount > 0) ? maximumImagesCount : 15;
 
     self.outputType = [[options objectForKey:@"outputType"] integerValue];
-    BOOL allow_video = [[options objectForKey:@"allow_video" ] boolValue ];
-    NSInteger maximumImagesCount = [[options objectForKey:@"maximumImagesCount"] integerValue];
-    NSString * title = [options objectForKey:@"title"];
-    NSString * message = [options objectForKey:@"message"];
+    self.allow_video = [[options objectForKey:@"allow_video" ] boolValue ];
+    self.title = [options objectForKey:@"title"];
+    self.message = [options objectForKey:@"message"];
     BOOL disable_popover = [[options objectForKey:@"disable_popover" ] boolValue];
+
     if (message == (id)[NSNull null]) {
       message = nil;
     }
@@ -70,7 +71,11 @@ typedef enum : NSUInteger {
     self.quality = [[options objectForKey:@"quality"] integerValue];
 
     self.callbackId = command.callbackId;
-    [self launchGMImagePicker:allow_video title:title message:message disable_popover:disable_popover maximumImagesCount:maximumImagesCount];
+    [self launchGMImagePicker:self.allow_video title:self.title message:self.message disable_popover:disable_popover maximumImagesCount:self.maximumImagesCount];
+}
+
+- (void) cleanupTempFiles:(CDVInvokedUrlCommand *)command {
+    [self cleanupTempFiles];
 }
 
 - (void)launchGMImagePicker:(bool)allow_video title:(NSString *)title message:(NSString *)message disable_popover:(BOOL)disable_popover maximumImagesCount:(NSInteger)maximumImagesCount
@@ -152,6 +157,11 @@ typedef enum : NSUInteger {
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
+    CDVPluginResult* pluginResult = nil;
+    NSArray* emptyArray = [NSArray array];
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:emptyArray];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+
     [picker.presentingViewController dismissViewControllerAnimated:YES completion:nil];
     NSLog(@"UIImagePickerController: User pressed cancel button");
 }
@@ -231,12 +241,70 @@ typedef enum : NSUInteger {
 
     [self.viewController dismissViewControllerAnimated:YES completion:nil];
     [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+}
 
+- (NSString *)applicationDocumentsDirectory
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+    return basePath;
+}
+
+- (NSString *)getDraftsDirectory
+{
+    NSString *draftsDirectory = [[self applicationDocumentsDirectory] stringByAppendingPathComponent:@"drafts"];
+    [self createDirectory:draftsDirectory];
+    return draftsDirectory;
+}
+
+- (void)cleanupTempFiles {
+    NSString* docsPath = [NSTemporaryDirectory()stringByStandardizingPath];
+    NSFileManager *localFileManager=[[NSFileManager alloc] init];
+    NSDirectoryEnumerator *dirEnum = [localFileManager enumeratorAtPath:docsPath];
+
+    NSString *file;
+
+    while ((file = [dirEnum nextObject])) {
+        if([file.pathExtension isEqual: @"jpg"] || [file.pathExtension isEqual: @"jpeg" ] || [file.pathExtension isEqual: @"png"]) {
+            NSString *filePath = [[docsPath stringByAppendingString:@"/"] stringByAppendingString:file];
+            NSLog(@"Deleting file at %@", filePath);
+            NSError* err = nil;
+            [localFileManager removeItemAtPath:filePath
+                                         error:&err];
+            if(err) {
+                NSLog(@"Delete returned error: %@", [err localizedDescription]);
+            }
+        }
+    }
+
+    NSString* docsPath2 = [self getDraftsDirectory];
+    NSFileManager *localFileManager2=[[NSFileManager alloc] init];
+    NSDirectoryEnumerator *dirEnum2 = [localFileManager2 enumeratorAtPath:docsPath2];
+
+    while ((file = [dirEnum2 nextObject])) {
+        if([file.pathExtension isEqual: @"jpg"] || [file.pathExtension isEqual: @"jpeg" ] || [file.pathExtension isEqual: @"png"]) {
+            NSString *filePath = [[docsPath2 stringByAppendingString:@"/"] stringByAppendingString:file];
+            NSLog(@"Deleting file at %@", filePath);
+            NSError* err = nil;
+            [localFileManager removeItemAtPath:filePath
+                                         error:&err];
+            if(err) {
+                NSLog(@"Delete returned error: %@", [err localizedDescription]);
+            }
+        }
+    }
+
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:true];
+    [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
 }
 
 //Optional implementation:
 -(void)assetsPickerControllerDidCancel:(GMImagePickerController *)picker
 {
+    CDVPluginResult* pluginResult = nil;
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"User canceled"];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackId];
+
     NSLog(@"GMImagePicker: User pressed cancel button");
 }
 
