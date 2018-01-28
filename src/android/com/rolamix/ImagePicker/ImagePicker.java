@@ -234,8 +234,8 @@ public class ImagePicker extends CordovaPlugin {
       }
       switch (requestCode) {
         case PERMISSION_REQUEST_CODE:
-          if (intent != null) {
-              this.cordova.startActivityForResult(this, imagePickerIntent, ImagePickerPluginActivity.REQUEST_IMAGEPICKER);
+          if (imagePickerIntent != null) {
+              this.cordova.startActivityForResult(this, imagePickerIntent, MultiImageChooserActivity.REQUEST_IMAGEPICKER);
           }
           break;
       }
