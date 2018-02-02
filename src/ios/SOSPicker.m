@@ -63,8 +63,8 @@ typedef enum : NSUInteger {
     self.message = [options objectForKey:@"message"];
     BOOL disable_popover = [[options objectForKey:@"disable_popover" ] boolValue];
 
-    if (message == (id)[NSNull null]) {
-      message = nil;
+    if (self.message == (id)[NSNull null]) {
+      self.message = nil;
     }
     self.width = [[options objectForKey:@"width"] integerValue];
     self.height = [[options objectForKey:@"height"] integerValue];
@@ -241,6 +241,28 @@ typedef enum : NSUInteger {
 
     [self.viewController dismissViewControllerAnimated:YES completion:nil];
     [self.commandDelegate sendPluginResult:result callbackId:self.callbackId];
+}
+
+- (NSString*)createDirectory:(NSString*)dir
+{
+    BOOL isDir = FALSE;
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    BOOL isDirExist = [fileManager fileExistsAtPath:dir isDirectory:&isDir];
+
+    //If dir is not exist, create it
+    if(!(isDirExist && isDir))
+    {
+        BOOL bCreateDir =[[NSFileManager defaultManager] createDirectoryAtPath:dir withIntermediateDirectories:YES attributes:nil error:nil];
+        if (bCreateDir == NO)
+        {
+            NSLog(@"Failed to create Directory:%@", dir);
+            return nil;
+        }
+    } else{
+        //NSLog(@"Directory exist:%@", dir);
+    }
+
+    return dir;
 }
 
 - (NSString *)applicationDocumentsDirectory
